@@ -41,6 +41,8 @@ class Game {
     fuels = new Group();
     powerCoins = new Group();
 
+    obstacles = new Group();
+
     var obstaclesPositions = [
       { x: width / 2 + 250, y: height - 800, image: obstacle2Image },
       { x: width / 2 - 150, y: height - 1300, image: obstacle1Image },
@@ -61,15 +63,28 @@ class Game {
 
     // Adicionar sprite de moeda no jogo
     this.addSprites(powerCoins, 18, powerCoinImage, 0.09);
+
+    this.addSprites(
+      obstacles,
+      obstaclesPositions.length,
+      obstacle1Image,
+      0.04,
+      obstaclesPositions
+    )
   }
 
   addSprites(spriteGroup, numberOfSprites, spriteImage, scale) {
     for (var i = 0; i < numberOfSprites; i++) {
       var x, y;
-
+    
+      if(positions.length > 0){
+        x = positions[i].x;
+        y = positions[i].y;
+        spriteImage = positions[i].image;
+      } else{
       x = random(width / 2 + 150, width / 2 - 150);
       y = random(-height * 4.5, height - 400);
-
+    }
       var sprite = createSprite(x, y);
       sprite.addImage("sprite", spriteImage);
 
@@ -131,6 +146,8 @@ class Game {
           fill("red");
           ellipse(x, y, 60, 60);
 
+          this.handleFuel(index);
+          this.handlePowerCoins(index);
           //alterar a posição da câmera na direção y
           camera.position.y = cars[index - 1].position.y;
         }
@@ -212,5 +229,20 @@ class Game {
       player.positionX += 5;
       player.update();
     }
+  }
+
+  handleFuel(index){
+    cars[index - 1].overlap(fuels, function(collector, collected){
+      player.fuel = 185;
+      collected.remove();
+    });
+  }
+
+  handlePowerCoins(index){
+    cars[index - 1].overlap(powerCoins, function(collecter, collected){
+      player.score += 21;
+      player.update();
+      collected.remove();
+    });
   }
 }
